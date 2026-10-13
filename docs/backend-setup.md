@@ -4,6 +4,8 @@ This first backend slice includes business-interest registration, an owner login
 
 ## Requirements and setup
 
+For cPanel database creation and phpMyAdmin import, follow [the database setup guide](cpanel-database-setup.md).
+
 1. Use supported PHP 8.x with PDO MySQL and a local MySQL 8.x database. No PHP or database packages have been installed by this change.
 2. Review `database/migrations/001_customer_administration.sql` before manually applying it to a **new local or staging database**. No migration has been executed. If existing tables have matching names, stop and adapt the migration rather than overwriting them.
 3. Supply the variables in `.env.example` through the PHP server environment. `.env` files are deliberately not auto-loaded. Use separate migration credentials; runtime access needs SELECT/INSERT/UPDATE on tenants, SELECT/INSERT on subscriptions and audit_logs and SELECT/INSERT/UPDATE on request_limits.
