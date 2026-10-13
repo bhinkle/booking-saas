@@ -49,9 +49,9 @@ Confirm product name, currency, trial policy, billing intervals, refund/cancella
 
 | Plan | Monthly subscription | Setup fee | Includes |
 | --- | --- | --- | --- |
-| Starter | $199 | $499 | Website, booking engine, hosting, admin dashboard, basic email notifications |
-| Professional | $399 | $999 | Everything in Starter, plus iPhone app, SMS alerts, calendar, reports, priority support |
-| Growth | $799 | $1,499 | Everything in Professional, plus managed Google Ads, SEO basics, monthly marketing reports |
+| Starter | $299 | $499 | Website, booking engine, hosting, admin dashboard, basic email notifications |
+| Professional | $499 | $999 | Everything in Starter, plus iPhone app, SMS alerts, calendar, reports, priority support |
+| Growth | $899 | $1,499 | Everything in Professional, plus managed Google Ads, SEO basics, monthly marketing reports |
 
 These prices and inclusions were supplied by the owner. Currency, taxes, setup-fee collection timing, service limits, and cancellation terms remain to be confirmed before configuring billing. Google Ads spend is separate from the Growth subscription fee. Features are planned while the platform is in development; the iPhone app must not be advertised as already available. No NMI plans or charges have been created.
 
