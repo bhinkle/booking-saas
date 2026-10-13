@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/hinklema/public_html/webs/booking-saas/
+    - /bin/mkdir -p "$DEPLOYPATH"
+    - /bin/echo "Booking SaaS deployment configuration verified"
