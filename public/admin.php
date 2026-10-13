@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'Too many attempts. Try again in 15 minutes.';
             } else {
                 // Perform password work even when the submitted email is wrong.
-                $validPassword = $passwordHash !== '' && password_verify(input('password'), $passwordHash);
+                $validPassword = $passwordHash !== '' && password_verify(is_string($_POST['password'] ?? null) ? $_POST['password'] : '', $passwordHash);
                 if ($ownerEmail !== '' && hash_equals(strtolower($ownerEmail), strtolower(input('email'))) && $validPassword) {
                     audit($connection, $ownerEmail, 'owner.login');
                     session_regenerate_id(true);
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
-pageStart(isset($_SESSION['owner']) ? 'Your customers' : 'Owner sign-in');
+pageStart(isset($_SESSION['owner']) ? 'Your tenants' : 'Owner sign-in');
 if ($error !== '') {
     echo '<p class="notice error" role="alert">' . escape($error) . '</p>';
 }
@@ -59,11 +59,11 @@ if (!isset($_SESSION['owner'])) {
     pageEnd();
     exit;
 }
-echo '<div class="admin-toolbar"><p>Businesses registered for the platform</p><form method="post"><input type="hidden" name="csrf" value="' . escape($_SESSION['csrf']) . '"><input type="hidden" name="action" value="logout"><button class="button small">Sign out</button></form></div><p class="notice">NMI is not configured. Registrations are pending review. Payment status is unverified until a gateway integration verifies provider records; no account can be marked paid from this screen.</p>';
+echo '<div class="admin-toolbar"><p>Businesses registered for the platform</p><a class="button small" href="/tenant.php?id=new">Add tenant ↗</a><form method="post"><input type="hidden" name="csrf" value="' . escape($_SESSION['csrf']) . '"><input type="hidden" name="action" value="logout"><button class="button small">Sign out</button></form></div><p class="notice">NMI is not configured. Registrations are pending review. Payment status is unverified until a gateway integration verifies provider records; no account can be marked paid from this screen.</p>';
 $query = $_GET['q'] ?? '';
 $query = is_string($query) ? substr(trim($query), 0, 150) : '';
 $page = max(1, min(100000, (int) ($_GET['page'] ?? 1)));
-echo '<form method="get" class="search-form"><label>Find a customer<input name="q" value="' . escape($query) . '" placeholder="Business name or email" maxlength="150"></label><button class="button small">Search</button></form>';
+echo '<form method="get" class="search-form"><label>Find a tenant<input name="q" value="' . escape($query) . '" placeholder="Business name or email" maxlength="150"></label><button class="button small">Search</button></form>';
 try {
     $connection = db();
     audit($connection, $_SESSION['owner'], 'owner.customers_viewed');
@@ -74,12 +74,12 @@ try {
     $hasNext = count($rows) > 25;
     echo '<div class="table-scroll"><table><thead><tr><th>Business</th><th>Contact</th><th>Rentals</th><th>Account</th><th>Billing</th><th>Paid through (UTC)</th></tr></thead><tbody>';
     foreach (array_slice($rows, 0, 25) as $row) {
-        echo '<tr><td><strong>' . escape($row['business_name']) . '</strong><br><small>Registered ' . escape($row['created_at']) . ' UTC</small></td><td>' . escape($row['contact_name']) . '<br>' . escape($row['contact_email']) . '</td><td>' . escape($row['rental_type']) . '</td><td>' . escape(str_replace('_', ' ', $row['lifecycle_status'])) . '</td><td>' . escape(str_replace('_', ' ', $row['billing_status'])) . '<br><small>' . ($row['last_verified_at'] ? 'Verified ' . escape($row['last_verified_at']) . ' UTC' : 'Not verified') . '</small></td><td>' . escape($row['paid_through_at'] ?? 'Not available') . '</td></tr>';
+        echo '<tr><td><strong><a class="text-link" href="/tenant.php?id=' . (int) $row['id'] . '">' . escape($row['business_name']) . '</a></strong><br><small>Registered ' . escape($row['created_at']) . ' UTC</small></td><td>' . escape($row['contact_name']) . '<br>' . escape($row['contact_email']) . '</td><td>' . escape($row['rental_type']) . '</td><td>' . escape(str_replace('_', ' ', $row['lifecycle_status'])) . '</td><td>' . escape(str_replace('_', ' ', $row['billing_status'])) . '<br><small>' . ($row['last_verified_at'] ? 'Verified ' . escape($row['last_verified_at']) . ' UTC' : 'Not verified') . '</small></td><td>' . escape($row['paid_through_at'] ?? 'Not available') . '</td></tr>';
     }
     if ($rows === []) {
-        echo '<tr><td colspan="6">No customers found.</td></tr>';
+        echo '<tr><td colspan="6">No tenants found.</td></tr>';
     }
-    echo '</tbody></table></div><nav class="pagination" aria-label="Customer pages">';
+    echo '</tbody></table></div><nav class="pagination" aria-label="Tenant pages">';
     if ($page > 1) {
         echo '<a href="?q=' . escape(rawurlencode($query)) . '&amp;page=' . ($page - 1) . '">← Previous</a>';
     }

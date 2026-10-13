@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 // Early local/staging foundation. MFA and verified billing are launch gates.
+// Buffer rendered HTML so a later load failure can still set its HTTP status.
+ob_start();
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: same-origin');
