@@ -27,7 +27,7 @@ Then import `database/migrations/002_subscription_plans.sql` to create and seed 
 | `request_limits` | Registration and owner-login rate limits |
 | `plans` | Starter, Professional, and Growth prices and setup fees |
 
-The SQL creates no sample customers, passwords, or payment credentials. Plan monthly prices are $299/$499/$899, with $499/$999/$1,499 setup fees, stored as integer minor units. USD is provisional and needs confirmation before billing. All plans start with purchasing disabled. The current admin UI does not assign plans yet. No NMI subscriptions are created.
+The SQL creates no sample customers, passwords, or payment credentials. Plan monthly prices are $299/$499/$899, with $499/$999/$1,499 setup fees, stored as integer minor units. USD is provisional and needs confirmation before billing. All plans start with purchasing disabled. The admin tenant editor can assign plans without charging or activating an account. No NMI subscriptions are created.
 
 MySQL DDL can commit table creation independently. If import fails partway through, note the error and which tables exist; do not blindly rerun the entire script or delete existing tables. Review the failure before continuing. There are no DROP, DELETE, or TRUNCATE statements.
 
@@ -49,12 +49,12 @@ OWNER_PASSWORD_HASH=<a PHP password_hash result>
 SESSION_SECURE=1
 ```
 
-Use the database host supplied by your hosting provider if it differs from `localhost`. Environment variables must be available to PHP itself, not only to cPanel deployment commands. `.env.example` is a reference; copying it to `.env` will not load it automatically in the current application. Do not paste credentials into chat or put them in SQL, public files, or Git. If the host has no PHP environment configuration mechanism, a private configuration loader will need to be added before this backend can connect.
+Use the database host supplied by your hosting provider if it differs from `localhost`. Environment variables must be available to PHP itself, not only to cPanel deployment commands. `.env.example` is a reference; copying it to `.env` will not load it automatically in the current application. Do not paste credentials into chat or put them in SQL, public files, or Git. A private configuration loader is now included: copy `config.example.php` to `config.local.php` at the repository root, outside the public document root, and replace the placeholders privately. PHP server environment settings take precedence.
 
 The runtime database user needs:
 
 - `tenants`: SELECT, INSERT, UPDATE
-- `subscriptions`: SELECT, INSERT
+- `subscriptions`: SELECT, INSERT, UPDATE
 - `audit_logs`: SELECT, INSERT
 - `request_limits`: SELECT, INSERT, UPDATE
 - `plans`: SELECT

@@ -27,6 +27,14 @@ final class TenantManagement
         if (!in_array($data['lifecycle_status'] ?? '', self::STATUSES, true)) {
             throw new InvalidArgumentException('Choose a valid account status.');
         }
+        $plan = $data['plan_id'] ?? '';
+        if ($plan === '' || $plan === null) {
+            $data['plan_id'] = null;
+        } elseif (!is_scalar($plan) || filter_var($plan, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false) {
+            throw new InvalidArgumentException('Choose a valid subscription plan.');
+        } else {
+            $data['plan_id'] = (int) $plan;
+        }
         return $data;
     }
 
@@ -36,6 +44,7 @@ final class TenantManagement
         foreach (['business_name', 'contact_name', 'contact_email', 'rental_type', 'timezone', 'lifecycle_status'] as $key) {
             $values[] = $row[$key];
         }
+        $values[] = isset($row['plan_id']) ? (int) $row['plan_id'] : null;
         return hash('sha256', json_encode($values, JSON_THROW_ON_ERROR));
     }
 
@@ -55,8 +64,15 @@ final class TenantManagement
         $data = self::validate($data);
         $db->beginTransaction();
         try {
+            if ($data['plan_id'] !== null) {
+                $plan = $db->prepare('SELECT id FROM plans WHERE id = ?');
+                $plan->execute([$data['plan_id']]);
+                if (!$plan->fetch()) {
+                    throw new InvalidArgumentException('The selected plan no longer exists.');
+                }
+            }
             if ($id !== null) {
-                $statement = $db->prepare('SELECT t.*, s.billing_status, s.paid_through_at, s.last_verified_at FROM tenants t JOIN subscriptions s ON s.tenant_id = t.id WHERE t.id = ? FOR UPDATE');
+                $statement = $db->prepare('SELECT t.*, s.billing_status, s.paid_through_at, s.last_verified_at, s.plan_id, s.provider_subscription_reference FROM tenants t JOIN subscriptions s ON s.tenant_id = t.id WHERE t.id = ? FOR UPDATE');
                 $statement->execute([$id]);
                 $row = $statement->fetch();
                 if (!$row) {
@@ -68,8 +84,16 @@ final class TenantManagement
                 if ($data['lifecycle_status'] === 'active' && $row['lifecycle_status'] !== 'active' && !self::canActivate($row, new DateTimeImmutable('now', new DateTimeZone('UTC')))) {
                     throw new InvalidArgumentException('Activation requires an active, provider-verified subscription with a future paid-through date.');
                 }
+                $oldPlan = isset($row['plan_id']) ? (int) $row['plan_id'] : null;
+                if ($oldPlan !== $data['plan_id'] && !empty($row['provider_subscription_reference'])) {
+                    throw new InvalidArgumentException('A gateway subscription is linked. Plan changes must be synchronized through billing before saving.');
+                }
                 $statement = $db->prepare('UPDATE tenants SET business_name = ?, contact_name = ?, contact_email = ?, rental_type = ?, timezone = ?, lifecycle_status = ? WHERE id = ?');
                 $statement->execute([$data['business_name'], $data['contact_name'], $data['contact_email'], $data['rental_type'], $data['timezone'], $data['lifecycle_status'], $id]);
+                if ($oldPlan !== $data['plan_id']) {
+                    $db->prepare('UPDATE subscriptions SET plan_id = ? WHERE tenant_id = ?')->execute([$data['plan_id'], $id]);
+                    audit($db, $actor, 'plan.' . ($oldPlan ?? 'none') . '.to.' . ($data['plan_id'] ?? 'none'), $id);
+                }
                 audit($db, $actor, 'owner.tenant_updated', $id);
                 if ($row['lifecycle_status'] !== $data['lifecycle_status']) {
                     audit($db, $actor, 'status.' . $row['lifecycle_status'] . '.to.' . $data['lifecycle_status'], $id);
@@ -81,7 +105,7 @@ final class TenantManagement
                 $statement = $db->prepare('INSERT INTO tenants (business_name, contact_name, contact_email, rental_type, timezone) VALUES (?, ?, ?, ?, ?)');
                 $statement->execute([$data['business_name'], $data['contact_name'], $data['contact_email'], $data['rental_type'], $data['timezone']]);
                 $id = (int) $db->lastInsertId();
-                $db->prepare('INSERT INTO subscriptions (tenant_id) VALUES (?)')->execute([$id]);
+                $db->prepare('INSERT INTO subscriptions (tenant_id, plan_id) VALUES (?, ?)')->execute([$id, $data['plan_id']]);
                 audit($db, $actor, 'owner.tenant_created', $id);
             }
             $db->commit();

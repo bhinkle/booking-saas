@@ -8,7 +8,7 @@ For cPanel database creation and phpMyAdmin import, follow [the database setup g
 
 1. Use supported PHP 8.x with PDO MySQL and a local MySQL 8.x database. No PHP or database packages have been installed by this change.
 2. Review `database/migrations/001_customer_administration.sql` before manually applying it to a **new local or staging database**. No migration has been executed. If existing tables have matching names, stop and adapt the migration rather than overwriting them.
-3. Supply the variables in `.env.example` through the PHP server environment. `.env` files are deliberately not auto-loaded. Use separate migration credentials; runtime access needs SELECT/INSERT/UPDATE on tenants, SELECT/INSERT on subscriptions and audit_logs and SELECT/INSERT/UPDATE on request_limits.
+3. Supply the variables through the PHP server environment, or copy `config.example.php` to a private `config.local.php` at the repository root (outside the public document root). Server environment values override private file settings. `.env` files are deliberately not auto-loaded. Use separate migration credentials; runtime access needs SELECT/INSERT/UPDATE on tenants, SELECT/INSERT/UPDATE on subscriptions, SELECT/INSERT on audit_logs, and SELECT on plans and SELECT/INSERT/UPDATE on request_limits.
 4. Generate the owner password hash with PHP's `password_hash()` using an interactive password prompt or a trusted password tool; do not put the password or resulting hash in Git or command history. Supply the hash as `OWNER_PASSWORD_HASH` and the owner address as `OWNER_EMAIL`.
 5. Set `APP_ENV=local` or `staging`. For HTTPS set `SESSION_SECURE=1`; only local HTTP uses `0`.
 6. Start from the repository root with `php -S 127.0.0.1:8080 -t public`. Open `/register.php` to register interest and `/admin.php` to sign in as the configured owner. Python's static server previews only the marketing page and must not be used to serve PHP backend files.
@@ -28,7 +28,7 @@ The implementation environment does not have PHP or a running MySQL instance, so
 
 ## Remaining backend work
 
-This is a foundation, not a complete customer/payment management system. Add authenticated owner roles with MFA, email verification and invitations, editable customer records with audits, approved plans, and NMI hosted/tokenized collection. Verify the selected NMI API and webhook mechanism before implementing billing events, reconciliation, verified payments, dunning, and provisioning. Owner identity is currently a single configured credential, not a full users/roles implementation.
+This is a foundation, not a complete customer/payment management system. Add authenticated owner roles with MFA, email verification and invitations, full audit change details, versioned billing plans, and NMI hosted/tokenized collection. Verify the selected NMI API and webhook mechanism before implementing billing events, reconciliation, verified payments, dunning, and provisioning. Owner identity is currently a single configured credential, not a full users/roles implementation.
 
 Add automated PHP/MySQL integration tests before expanding behavior or deploying. Define trial, currency, pricing, cancellation, refund, and grace-period rules with the owner. Separate platform subscriptions from tenants' rental payments. Add bounded cleanup for rate-limit/audit retention, environment-aware structured logging, alerts, backups, and restoration verification.
 
@@ -41,3 +41,15 @@ Activation requires subscription state `active`, a provider-verification timesta
 No additional migration is needed for this slice; it uses `001_customer_administration.sql`. No database changes have been executed. The cPanel configuration currently only creates a directory and echoes a message; it does not deploy this backend or configure its environment. Keep `src/` and SQL files outside the public web root.
 
 Run `php tests/tenant-management.php` for domain validation and activation checks. Still verify against disposable MySQL: unauthenticated access, expired sessions, CSRF failures, atomic create/update/audit, conflicting edits, duplicate emails, missing tenants, search pagination, preserved records after suspension, and billing activation guards. PHP/MySQL are absent in the development workspace, so these checks have not been executed there.
+
+## Expanded tenant administration
+
+- `/admin.php`: global tenant counts, search, account/billing filters, paginated directory with assigned plans. Pagination preserves filters.
+- `/tenant.php`: business creation/editing, timezone and account status, plan assignment, verified billing display, recent activity. Unassigned plans are allowed. Only owner-authenticated, CSRF-protected saves are accepted. Plan changes are included in concurrent-edit checks and audit entries. A linked provider subscription blocks local plan reassignment until billing synchronization is implemented.
+- `/plans.php`: read-only Starter/Professional/Growth catalog, prices, setup fees, and tenant assignment counts. Counts are not paid customer counts.
+
+Use the already imported migrations 001 and 002; no new SQL import is required. The runtime account now also needs UPDATE on subscriptions for plan assignment and SELECT on plans. Plans remain disabled for purchase, and assignment does not change billing or entitlements.
+
+For cPanel, copy `config.example.php` to `config.local.php` beside `src/`, with both outside the public document root, and privately replace password/owner placeholders. Alternatively put the file elsewhere outside the web root and provide its absolute path as `APP_CONFIG_FILE` in PHP's server environment. Never put the private file under `public/`; do not deploy a repository root containing private source as a public document root. The private file is ignored by Git. Environment settings take precedence. `.env.example` is still documentation only.
+
+Verify owner login, create/edit, plan changes, invalid plan IDs, cross-request CSRF, filters and pagination, transaction rollback/audit, linked-provider plan restrictions, and conflicting plan edits against disposable MySQL. PHP/MySQL runtime tests and browser layout checks are still pending in this workspace. The cPanel deployment task has not been changed.

@@ -3,4 +3,5 @@
 !.env.example
 /vendor/
 /storage/
+/config.local.php
 .DS_Store

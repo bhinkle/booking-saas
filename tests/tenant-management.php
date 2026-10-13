@@ -30,4 +30,9 @@ foreach (['billing_status' => 'pending', 'last_verified_at' => null, 'paid_throu
     check(!TenantManagement::canActivate(array_replace($billing, [$field => $value]), $now), 'Reject activation for ' . $field);
 }
 check(TenantManagement::revision($valid) !== TenantManagement::revision(array_replace($valid, ['lifecycle_status' => 'suspended'])), 'Revision detects concurrent status changes');
+check(rejected(array_replace($valid, ['plan_id' => '-1'])), 'Reject negative plan ID');
+check(rejected(array_replace($valid, ['plan_id' => ['unexpected']])), 'Reject array plan ID');
+check(TenantManagement::validate(array_replace($valid, ['plan_id' => '2']))['plan_id'] === 2, 'Normalize positive plan ID');
+check(TenantManagement::validate(array_replace($valid, ['plan_id' => '']))['plan_id'] === null, 'Allow unassigned plan');
+check(TenantManagement::revision($valid) !== TenantManagement::revision(array_replace($valid, ['plan_id' => 2])), 'Revision detects concurrent plan changes');
 echo "PASS: tenant validation, normalization, activation rules, and revision conflicts\n";

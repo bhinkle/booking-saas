@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/src/bootstrap.php';
 
-if (!in_array(getenv('APP_ENV'), ['local', 'staging'], true)) {
+if (!in_array(configValue('APP_ENV'), ['local', 'staging'], true)) {
     http_response_code(503);
     pageStart('Registration is not open yet');
     echo '<p>Registration will open when launch terms and account verification are ready.</p>';

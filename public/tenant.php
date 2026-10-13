@@ -3,7 +3,7 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/src/bootstrap.php';
 require dirname(__DIR__) . '/src/TenantManagement.php';
 
-if (!in_array(getenv('APP_ENV'), ['local', 'staging'], true)) {
+if (!in_array(configValue('APP_ENV'), ['local', 'staging'], true)) {
     http_response_code(503);
     pageStart('Tenant management unavailable');
     echo '<p>Owner administration is restricted to local/staging until launch gates are complete.</p>';
@@ -23,12 +23,13 @@ if ($id === false) {
     exit;
 }
 $error = '';
-$row = ['business_name' => '', 'contact_name' => '', 'contact_email' => '', 'rental_type' => '', 'timezone' => 'America/New_York', 'lifecycle_status' => 'pending_review'];
+$row = ['business_name' => '', 'contact_name' => '', 'contact_email' => '', 'rental_type' => '', 'timezone' => 'America/New_York', 'lifecycle_status' => 'pending_review', 'plan_id' => null];
 $history = [];
 try {
     $connection = db();
+    $plans = $connection->query('SELECT * FROM plans ORDER BY monthly_amount_minor')->fetchAll();
     if ($id !== null) {
-        $statement = $connection->prepare('SELECT t.*, s.billing_status, s.paid_through_at, s.last_verified_at FROM tenants t JOIN subscriptions s ON s.tenant_id = t.id WHERE t.id = ?');
+        $statement = $connection->prepare('SELECT t.*, s.billing_status, s.paid_through_at, s.last_verified_at, s.plan_id FROM tenants t JOIN subscriptions s ON s.tenant_id = t.id WHERE t.id = ?');
         $statement->execute([$id]);
         $row = $statement->fetch();
         if (!$row) {
@@ -44,7 +45,7 @@ try {
             $error = 'Your form expired. Reload the page and try again.';
         } else {
             $data = [];
-            foreach (['business_name', 'contact_name', 'contact_email', 'rental_type', 'timezone', 'lifecycle_status'] as $field) {
+            foreach (['business_name', 'contact_name', 'contact_email', 'rental_type', 'timezone', 'lifecycle_status', 'plan_id'] as $field) {
                 $data[$field] = input($field);
             }
             try {
@@ -97,7 +98,13 @@ foreach (['rental_type' => ['Rental type', TenantManagement::TYPES], 'timezone' 
     }
     echo '</select></label>';
 }
-echo '<p class="form-note">Suspending or canceling updates the business account record and preserves history. It does not cancel an NMI subscription. Activation requires verified billing; provisioning is not connected yet.</p><button class="button">Save tenant</button></form></section><aside><section class="tenant-panel"><h2>Subscription</h2><p><strong>' . escape(str_replace('_', ' ', $row['billing_status'] ?? 'not_configured')) . '</strong></p><dl><dt>Paid through (UTC)</dt><dd>' . escape($row['paid_through_at'] ?? 'Not available') . '</dd><dt>Last verified (UTC)</dt><dd>' . escape($row['last_verified_at'] ?? 'Not verified') . '</dd></dl><p class="form-note">Payment setup and plan assignment will be added with NMI integration. No payment is collected by this screen.</p></section><section class="tenant-panel"><h2>Recent activity</h2>';
+echo '<label>Subscription plan<select name="plan_id"><option value="">Not assigned</option>';
+foreach ($plans as $plan) {
+    $label = $plan['name'] . ' — ' . $plan['currency'] . ' ' . number_format((int) $plan['monthly_amount_minor'] / 100, 2) . '/month + ' . number_format((int) $plan['setup_amount_minor'] / 100, 2) . ' setup';
+    echo '<option value="' . (int) $plan['id'] . '"' . ((int) ($row['plan_id'] ?? 0) === (int) $plan['id'] ? ' selected' : '') . '>' . escape($label) . '</option>';
+}
+echo '</select></label><p class="form-note">Plan assignment records the intended package. It does not collect payment or enable features.</p>';
+echo '<p class="form-note">Suspending or canceling updates the business account record and preserves history. It does not cancel an NMI subscription. Activation requires verified billing; provisioning is not connected yet.</p><button class="button">Save tenant</button></form></section><aside><section class="tenant-panel"><h2>Subscription</h2><p><strong>' . escape(str_replace('_', ' ', $row['billing_status'] ?? 'not_configured')) . '</strong></p><dl><dt>Paid through (UTC)</dt><dd>' . escape($row['paid_through_at'] ?? 'Not available') . '</dd><dt>Last verified (UTC)</dt><dd>' . escape($row['last_verified_at'] ?? 'Not verified') . '</dd></dl><p class="form-note">Payment setup will be added with NMI integration. No payment is collected by this screen.</p></section><section class="tenant-panel"><h2>Recent activity</h2>';
 if ($history === []) {
     echo '<p>No activity yet.</p>';
 }

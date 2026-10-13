@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/configuration.php';
+
 // Early local/staging foundation. MFA and verified billing are launch gates.
 // Buffer rendered HTML so a later load failure can still set its HTTP status.
 ob_start();
@@ -14,7 +16,7 @@ ini_set('session.use_only_cookies', '1');
 session_name('booking_owner');
 session_set_cookie_params([
     'httponly' => true,
-    'secure' => getenv('SESSION_SECURE') !== '0',
+    'secure' => configValue('SESSION_SECURE') !== '0',
     'samesite' => 'Lax',
     'path' => '/',
 ]);
@@ -47,11 +49,11 @@ function db(): PDO
     if ($connection instanceof PDO) {
         return $connection;
     }
-    $dsn = getenv('DB_DSN');
+    $dsn = configValue('DB_DSN');
     if (!$dsn || !str_starts_with($dsn, 'mysql:')) {
         throw new RuntimeException('MySQL environment configuration is required.');
     }
-    $connection = new PDO($dsn, getenv('DB_USER') ?: '', getenv('DB_PASSWORD') ?: '', [
+    $connection = new PDO($dsn, configValue('DB_USER'), configValue('DB_PASSWORD'), [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
@@ -85,7 +87,11 @@ function audit(PDO $db, string $actor, string $action, ?int $tenantId = null): v
 
 function pageStart(string $title): void
 {
-    echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>' . escape($title) . ' — Booking SaaS</title><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/admin.css"></head><body><header class="header wrap"><a class="brand" href="/">booking<span class="brand-light">saas</span></a><a href="/">Back to website</a></header><main class="wrap admin-main"><p class="eyebrow">LOCAL / STAGING FOUNDATION</p><h1>' . escape($title) . '</h1>';
+    echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>' . escape($title) . ' — Booking SaaS</title><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/admin.css?v=tenant-admin-2"></head><body><header class="header wrap"><a class="brand" href="/">booking<span class="brand-light">saas</span></a><a href="/">Back to website</a></header><main class="wrap admin-main">';
+    if (isset($_SESSION['owner'])) {
+        echo '<nav class="admin-navigation" aria-label="Owner navigation"><a href="/admin.php">Tenants</a><a href="/tenant.php?id=new">Add tenant</a><a href="/plans.php">Plans</a></nav>';
+    }
+    echo '<p class="eyebrow">PLATFORM ADMINISTRATION</p><h1>' . escape($title) . '</h1>';
 }
 
 function pageEnd(): void

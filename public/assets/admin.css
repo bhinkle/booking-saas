@@ -9,3 +9,13 @@
 .activity{font-size:12px;overflow-wrap:anywhere;border-top:1px solid var(--line);padding-top:15px}
 .admin-toolbar>p{margin-right:auto}
 @media(max-width:760px){.tenant-layout{grid-template-columns:1fr}.admin-toolbar{flex-wrap:wrap}.tenant-panel{padding:20px}}
+
+.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin:28px 0}
+.admin-stats>div{padding:22px;background:white;border:1px solid var(--line);border-radius:10px}
+.admin-stats span{font-size:12px;color:var(--muted);display:block}.admin-stats strong{font-size:34px;font-weight:600}
+.filter-form{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin:30px 0}.filter-form label{margin:0;flex:1;min-width:160px}.filter-form .text-link{padding-bottom:10px}
+.status-badge{display:inline-block;padding:4px 9px;background:#edf2eb;border-radius:15px;font-size:11px;white-space:nowrap}
+.table-caption{text-align:left;font-size:19px;font-weight:600;padding:20px;border-bottom:1px solid var(--line)}
+@media(max-width:760px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-stats>div{padding:16px}.filter-form label{flex-basis:100%}}
+.admin-navigation{display:flex;gap:24px;margin:0 0 30px;padding:16px 0;border-bottom:1px solid var(--line);font-size:13px}
+.admin-navigation a:hover{text-decoration:underline}
