@@ -20,4 +20,4 @@ Use case: photorealistic-natural. Asset type: wide landscape photograph for a re
 
 ## Integration
 
-The images appear below the industry list in a two-column gallery that stacks on mobile. Images include descriptive alt text, explicit dimensions, responsive sources, lazy loading, and asynchronous decoding. Captions stay outside the images for readability. JPEG export uses quality 82; no new dependencies were installed.
+The images appear below the industry list in a two-column gallery that stacks on mobile. Each image sits in a dedicated div with a bounded responsive height, overflow clipping, and object-fit cropping. Images include descriptive alt text, explicit dimensions, responsive sources, lazy loading, and asynchronous decoding. Captions stay outside the images for readability. JPEG export uses quality 82; no new dependencies were installed.

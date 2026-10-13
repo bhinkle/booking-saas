@@ -32,10 +32,13 @@
 .watercraft-heading h2{font-size:38px;line-height:1.15;letter-spacing:-1.5px;font-weight:600;margin:0}
 .watercraft-heading>p{max-width:315px;color:var(--muted);font-size:14px;margin:0}
 .watercraft-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
-.watercraft-gallery figure{margin:0;border-radius:12px;overflow:hidden;background:var(--ink)}
-.watercraft-gallery img{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+.watercraft-gallery figure{margin:0;min-width:0;border:1px solid #d1ded6;border-radius:12px;overflow:hidden;background:var(--ink);box-shadow:0 8px 24px #112c3510}
+.watercraft-image-box{width:100%;height:clamp(220px,25vw,300px);overflow:hidden;background:#dfeae3}
+.watercraft-image-box img{display:block;width:100%;height:100%;max-width:100%;object-fit:cover;object-position:center 65%}
 .watercraft-gallery figcaption{padding:20px 24px;color:#fff}
 .watercraft-gallery figcaption span{display:block;font-size:9px;letter-spacing:1.7px;color:#a5c8b7;margin-bottom:6px}
 .watercraft-gallery figcaption strong{font-size:20px;font-weight:500;letter-spacing:-.4px}
 .image-note{font-size:10px;color:var(--muted);margin:12px 0 0}
 @media(max-width:760px){.watercraft-section{padding-top:50px}.watercraft-heading{flex-direction:column;align-items:flex-start;gap:18px}.watercraft-heading h2{font-size:32px}.watercraft-heading>p{max-width:500px}.watercraft-gallery{grid-template-columns:1fr;gap:20px}}
+
+@media(max-width:760px){.watercraft-image-box{height:clamp(210px,60vw,320px)}}
