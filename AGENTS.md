@@ -1,4 +1,4 @@
-# Booking SaaS — Codex Project Instructions
+# Booking Software — Codex Project Instructions
 
 ## Mission
 Build a commercial, subscription-based, multi-tenant booking platform. Launch for jet ski, boat, pontoon, golf cart, ATV, and other recreational rental operators, while keeping inventory and scheduling flexible enough to support additional booking industries later.

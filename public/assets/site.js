@@ -30,7 +30,7 @@ document.querySelectorAll('[data-plan]').forEach(link => {
 document.querySelector('#inquiry-form').addEventListener('submit', event => {
   event.preventDefault();
   const data = new FormData(event.currentTarget);
-  const content = ['Booking SaaS — inquiry draft', '', 'Name: ' + data.get('name'), 'Business: ' + data.get('business'), 'Email: ' + data.get('email'), 'Rental type: ' + data.get('industry'), 'Interested plan: ' + data.get('plan'), '', String(data.get('message') || ''), '', 'Local draft only. This inquiry has not been sent.'].join('\n');
+  const content = ['Booking Software — inquiry draft', '', 'Name: ' + data.get('name'), 'Business: ' + data.get('business'), 'Email: ' + data.get('email'), 'Rental type: ' + data.get('industry'), 'Interested plan: ' + data.get('plan'), '', String(data.get('message') || ''), '', 'Local draft only. This inquiry has not been sent.'].join('\n');
   const url = URL.createObjectURL(new Blob([content], { type: 'text/plain;charset=utf-8' }));
   const link = document.createElement('a');
   link.href = url;

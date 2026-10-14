@@ -1,4 +1,4 @@
-# Booking SaaS Platform
+# Booking Software Platform
 
 Public marketing website for a recreational rental booking platform in development.
 
