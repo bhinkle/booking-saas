@@ -44,9 +44,10 @@
 @media(max-width:760px){.watercraft-image-box{height:clamp(210px,60vw,320px)}}
 
 /* Registration uses the marketing contact form styles. */
+.contact-grid .registration-form{background:#fff;padding:30px;border-radius:12px}
 .contact-grid .registration-form fieldset{border:0;border-bottom:1px solid #c1d2c7;padding:0 0 24px;margin:0 0 28px;min-width:0}
 .contact-grid .registration-form legend{font-size:16px;font-weight:600;margin-bottom:20px;padding:0;color:var(--ink)}
 .contact-grid .registration-form .consent{display:flex;align-items:flex-start;gap:12px;line-height:1.6;font-weight:400}
 .contact-grid .registration-form .consent input{width:18px;height:18px;flex-shrink:0;margin-top:3px;accent-color:var(--teal)}
 .contact-grid .notice{padding:16px;border:1px solid #c39c87;background:#faeee7;border-radius:5px;font-size:14px;margin-bottom:24px}
-@media(max-width:760px){.contact-grid .registration-form .form-row{grid-template-columns:1fr;gap:0}}
+@media(max-width:760px){.contact-grid .registration-form{padding:22px 18px}.contact-grid .registration-form .form-row{grid-template-columns:1fr;gap:0}}
