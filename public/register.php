@@ -27,11 +27,11 @@
      http_response_code(($exception->errorInfo[1] ?? null) === 1062 ? 409 : 503);
      $error = ($exception->errorInfo[1] ?? null) === 1062 ? 'Unable to continue with these details. If you previously registered, contact support before submitting again.' : 'Registration is unavailable. Please try again later.';
  } catch (Throwable $exception) { http_response_code(503); $error = 'Registration is unavailable. Please try again later.'; }
- pageStart('Register your business');
- echo '<p class="admin-intro">Choose your plan and provide your business and billing details. Next, review setup plus your first month. Monthly recurring billing begins one month after successful signup. The platform is in development.</p>';
+ pageStart('Let’s get your business set up', true);
+ echo '<p class="admin-intro">Tell us about your business and choose a plan. You’ll review your setup fee and first month on the next page. Registration is currently available for staging review.</p>';
  if ($error !== '') echo '<p class="notice error" role="alert">' . escape($error) . '</p>';
  if ($plans === []) { echo '<p>Registration is temporarily unavailable.</p>'; pageEnd(); exit; }
- echo '<form method="post" class="registration-form"><input type="hidden" name="csrf" value="' . escape($_SESSION['csrf']) . '"><fieldset><legend>Your plan</legend><label>Subscription plan<select name="plan_id" required><option value="">Choose a plan</option>';
+ echo '<ol class="signup-steps" aria-label="Registration progress"><li aria-current="step"><span>1</span> Business details</li><li><span>2</span> Review &amp; payment</li><li><span>3</span> Account review</li></ol><form method="post" class="registration-form"><input type="hidden" name="csrf" value="' . escape($_SESSION['csrf']) . '"><fieldset><legend>Your plan</legend><label>Subscription plan<select name="plan_id" required><option value="">Choose a plan</option>';
  $code = is_string($_GET['plan'] ?? null) ? $_GET['plan'] : '';
  foreach ($plans as $plan) {
      $selected = $_SERVER['REQUEST_METHOD'] === 'POST' ? input('plan_id') === (string) $plan['id'] : $code === $plan['code'];

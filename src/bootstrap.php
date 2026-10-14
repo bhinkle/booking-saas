@@ -85,13 +85,13 @@ function audit(PDO $db, string $actor, string $action, ?int $tenantId = null): v
     $statement->execute([$actor, $action, $tenantId]);
 }
 
-function pageStart(string $title): void
+function pageStart(string $title, bool $registration = false): void
 {
-    echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>' . escape($title) . ' — Booking SaaS</title><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/admin.css?v=tenant-admin-2"></head><body><header class="header wrap"><a class="brand" href="/">booking<span class="brand-light">saas</span></a><a href="/">Back to website</a></header><main class="wrap admin-main">';
+    echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>' . escape($title) . ' — Booking SaaS</title><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/admin.css?v=signup-3"></head><body><header class="header wrap"><a class="brand" href="/">booking<span class="brand-light">saas</span></a><a href="/">Back to website</a></header><main class="wrap admin-main' . ($registration ? ' signup-main' : '') . '">';
     if (isset($_SESSION['owner'])) {
         echo '<nav class="admin-navigation" aria-label="Owner navigation"><a href="/admin.php">Tenants</a><a href="/tenant.php?id=new">Add tenant</a><a href="/plans.php">Plans</a></nav>';
     }
-    echo '<p class="eyebrow">PLATFORM ADMINISTRATION</p><h1>' . escape($title) . '</h1>';
+    echo '<p class="eyebrow">' . ($registration ? 'GET STARTED WITH BOOKINGSAAS' : 'PLATFORM ADMINISTRATION') . '</p><h1>' . escape($title) . '</h1>';
 }
 
 function pageEnd(): void

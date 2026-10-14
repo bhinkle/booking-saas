@@ -27,3 +27,27 @@
 .consent input{width:auto;flex-shrink:0;margin-top:5px}
 .tenant-panel dd{overflow-wrap:anywhere}
 @media(max-width:760px){.registration-form{padding:20px}.registration-form .form-row{grid-template-columns:1fr}}
+
+/* Customer signup */
+.signup-main{max-width:1000px;padding-top:48px}
+.signup-main>.eyebrow{color:var(--teal);margin-bottom:16px}
+.signup-main h1{font-size:clamp(32px,4.5vw,52px);line-height:1.12;letter-spacing:-1.8px;max-width:720px;margin-bottom:18px}
+.signup-main>.admin-intro{font-size:16px;line-height:1.75;max-width:650px;margin-bottom:28px}
+.signup-steps{display:flex;gap:32px;padding:0;margin:0 0 32px;list-style:none;flex-wrap:wrap}
+.signup-steps li{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;font-weight:600;padding:0}
+.signup-steps span{display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--line);border-radius:50%;background:white}
+.signup-steps [aria-current]{color:var(--teal)}
+.signup-steps [aria-current] span{background:var(--teal);color:white;border-color:var(--teal)}
+.signup-main .registration-form{max-width:none;background:transparent;border:0;padding:0;border-radius:0}
+.signup-main .registration-form fieldset{background:white;border:1px solid var(--line);border-radius:14px;margin-bottom:24px;padding:28px;box-shadow:0 4px 18px #112c3505}
+.signup-main .registration-form legend{float:left;width:100%;font-size:21px;letter-spacing:-.4px;margin:0 0 22px;padding:0}
+.signup-main .registration-form legend+*{clear:both}
+.signup-main .registration-form label{font-size:13px;margin-bottom:18px}
+.signup-main .registration-form .form-row{gap:0 24px}
+.signup-main .registration-form input:not([type=checkbox]),.signup-main .registration-form select{min-height:48px;background:#fff;border-color:#cad6d0;border-radius:7px;padding:12px}
+.signup-main .registration-form input:focus,.signup-main .registration-form select:focus{border-color:var(--teal)}
+.signup-main .form-note{font-size:12px;line-height:1.65;max-width:680px}
+.signup-main .consent{font-size:13px;max-width:700px;margin:28px 0 16px}
+.signup-main .consent input{width:18px;height:18px;accent-color:var(--teal)}
+.signup-main .registration-form>.button{min-height:52px;margin-top:4px}
+@media(max-width:760px){.signup-main{padding-top:26px}.signup-steps{gap:14px 20px}.signup-steps li{font-size:11px}.signup-main .registration-form fieldset{padding:22px 18px}.signup-main .registration-form>.button{width:100%;justify-content:center}.signup-main h1{letter-spacing:-1px}}
