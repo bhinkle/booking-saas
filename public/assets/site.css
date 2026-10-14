@@ -51,3 +51,5 @@
 .contact-grid .registration-form .consent input{width:18px;height:18px;flex-shrink:0;margin-top:3px;accent-color:var(--teal)}
 .contact-grid .notice{padding:16px;border:1px solid #c39c87;background:#faeee7;border-radius:5px;font-size:14px;margin-bottom:24px}
 @media(max-width:760px){.contact-grid .registration-form{padding:22px 18px}.contact-grid .registration-form .form-row{grid-template-columns:1fr;gap:0}}
+
+.contact-grid .registration-form input:disabled{background:#f3f5f2;color:var(--muted);cursor:not-allowed;opacity:1}
