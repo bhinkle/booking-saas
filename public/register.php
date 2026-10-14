@@ -28,17 +28,17 @@
      $error = ($exception->errorInfo[1] ?? null) === 1062 ? 'Unable to continue with these details. If you previously registered, contact support before submitting again.' : 'Registration is unavailable. Please try again later.';
  } catch (Throwable $exception) { http_response_code(503); $error = 'Registration is unavailable. Please try again later.'; }
  pageStart('Let’s get your business set up', true);
- echo '<p class="admin-intro">Tell us about your business and choose a plan. You’ll review your setup fee and first month on the next page. Registration is currently available for staging review.</p>';
+ echo '<div><p class="eyebrow">LET’S BUILD BETTER RENTAL DAYS</p><h2>Your next chapter<br>starts <em>here.</em></h2><p>Choose your plan and tell us about your business. Next, review your setup fee and first month.</p><p class="form-note">The platform is in development. Registration is available for staging review.</p></div><div>';
  if ($error !== '') echo '<p class="notice error" role="alert">' . escape($error) . '</p>';
- if ($plans === []) { echo '<p>Registration is temporarily unavailable.</p>'; pageEnd(); exit; }
- echo '<ol class="signup-steps" aria-label="Registration progress"><li aria-current="step"><span>1</span> Business details</li><li><span>2</span> Review &amp; payment</li><li><span>3</span> Account review</li></ol><form method="post" class="registration-form"><input type="hidden" name="csrf" value="' . escape($_SESSION['csrf']) . '"><fieldset><legend>Your plan</legend><label>Subscription plan<select name="plan_id" required><option value="">Choose a plan</option>';
+ if ($plans === []) { echo '<p>Registration is temporarily unavailable.</p></div>'; pageEnd(true); exit; }
+ echo '<form method="post" class="registration-form"><input type="hidden" name="csrf" value="' . escape($_SESSION['csrf']) . '"><fieldset><legend>01 / Your plan</legend><label>Subscription plan<select name="plan_id" required><option value="">Choose a plan</option>';
  $code = is_string($_GET['plan'] ?? null) ? $_GET['plan'] : '';
  foreach ($plans as $plan) {
      $selected = $_SERVER['REQUEST_METHOD'] === 'POST' ? input('plan_id') === (string) $plan['id'] : $code === $plan['code'];
      $label = $plan['name'] . ' — ' . $plan['currency'] . ' ' . number_format((int) $plan['monthly_amount_minor'] / 100, 2) . '/month + ' . number_format((int) $plan['setup_amount_minor'] / 100, 2) . ' setup';
      echo '<option value="' . (int) $plan['id'] . '"' . ($selected ? ' selected' : '') . '>' . escape($label) . '</option>';
  }
- echo '</select></label></fieldset><fieldset><legend>Business details</legend><div class="form-row">';
+ echo '</select></label></fieldset><fieldset><legend>02 / Business details</legend><div class="form-row">';
  foreach (['business_name' => ['Business name',150,'text'], 'contact_name' => ['Your name',100,'text'], 'contact_email' => ['Contact email',254,'email']] as $key => [$label,$length,$type]) echo '<label>' . $label . '<input name="' . $key . '" type="' . $type . '" maxlength="' . $length . '" required value="' . escape(input($key)) . '"></label>';
  foreach (['phone','existing_website','preferred_domain'] as $key) {
      [$label,$length] = Registration::FIELDS[$key];
@@ -48,10 +48,11 @@
  foreach (TenantManagement::TYPES as $type) echo '<option' . (input('rental_type') === $type ? ' selected' : '') . '>' . escape($type) . '</option>';
  echo '</select></label><label>Business timezone<select name="timezone">';
  foreach (DateTimeZone::listIdentifiers() as $timezone) echo '<option' . ((input('timezone') ?: 'America/New_York') === $timezone ? ' selected' : '') . '>' . escape($timezone) . '</option>';
- echo '</select></label></fieldset><fieldset><legend>Billing contact and address</legend><div class="form-row">';
+ echo '</select></label></fieldset><fieldset><legend>03 / Billing contact and address</legend><div class="form-row">';
  foreach (array_diff(array_keys(Registration::FIELDS), ['phone','existing_website','preferred_domain']) as $key) {
      [$label,$length] = Registration::FIELDS[$key];
      echo '<label>' . escape($label) . '<input name="' . $key . '" type="' . ($key === 'billing_email' ? 'email' : 'text') . '" maxlength="' . $length . '"' . ($key !== 'address2' ? ' required' : '') . ' value="' . escape(input($key)) . '"></label>';
  }
  echo '</div></fieldset><label class="consent"><input name="capture_consent" type="checkbox" value="yes" required' . (input('capture_consent') === 'yes' ? ' checked' : '') . '> I agree to have these business and billing contact details stored for registration and account review.</label><p class="form-note">Do not enter card numbers or security codes in this form. Payment collection is disabled until gateway setup and launch terms are complete.</p><button class="button">Continue to payment summary ↗</button></form>';
- pageEnd();
+ echo '</div>';
+ pageEnd(true);
