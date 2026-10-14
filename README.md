@@ -21,3 +21,5 @@ For a marketing-only preview without PHP, open `public/index.html` directly in a
 See [the phased architecture](docs/architecture.md) for customer registration, owner administration, and verified NMI subscription billing. Read [AGENTS.md](AGENTS.md) before making changes. `legacy-booking/` is currently empty; no existing booking logic has been changed.
 
 Private cPanel configuration is supported through `config.local.php` (copy `config.example.php` outside the public document root and replace dummy values privately). Server environment values override the file. Tenant filters and overview counts are available in the owner directory. No new migration is required beyond 001 and 002.
+
+Expanded signup captures billing contacts, phone, website, requested domain, and a selected plan. Plan buttons lead to registration and a payment summary. Review [registration and billing setup](docs/registration-billing.md); import migration 003 after review/backup. NMI checkout is sandbox-only and disabled until test keys are supplied privately. Customer activation and production payment processing are not enabled.

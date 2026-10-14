@@ -11,4 +11,8 @@ return [
     'OWNER_EMAIL' => 'owner@example.test',
     'OWNER_PASSWORD_HASH' => 'replace-with-a-PHP-password-hash',
     'SESSION_SECURE' => '1',
+    // Sandbox only. Keep disabled until test keys and staging QA are ready.
+    'NMI_SANDBOX_ENABLED' => '0',
+    'NMI_SECURITY_KEY' => '',
+    'NMI_TOKENIZATION_KEY' => '',
 ];

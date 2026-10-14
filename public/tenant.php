@@ -63,6 +63,9 @@ try {
         }
     }
     if ($id !== null) {
+        $statement = $connection->prepare('SELECT o.*, a.status AS signup_status, a.next_billing_date FROM tenant_onboarding o LEFT JOIN billing_signup_attempts a ON a.tenant_id = o.tenant_id WHERE o.tenant_id = ?');
+        $statement->execute([$id]);
+        $onboarding = $statement->fetch();
         audit($connection, $_SESSION['owner'], 'owner.tenant_viewed', $id);
         $statement = $connection->prepare('SELECT actor, action, created_at FROM audit_logs WHERE tenant_id = ? ORDER BY id DESC LIMIT 20');
         $statement->execute([$id]);
@@ -111,5 +114,13 @@ if ($history === []) {
 foreach ($history as $event) {
     echo '<p class="activity"><strong>' . escape($event['action']) . '</strong><br>' . escape($event['actor']) . '<br><small>' . escape($event['created_at']) . ' UTC</small></p>';
 }
-echo '</section></aside></div>';
+echo '</section>';
+if (!empty($onboarding)) {
+    echo '<section class="tenant-panel"><h2>Registration & billing contact</h2><dl>';
+    foreach (['phone' => 'Phone', 'existing_website' => 'Existing website', 'preferred_domain' => 'Requested domain', 'billing_name' => 'Billing name', 'billing_email' => 'Billing email', 'address1' => 'Street', 'address2' => 'Suite / unit', 'city' => 'City', 'region' => 'Region', 'postal_code' => 'Postal code', 'country' => 'Country', 'signup_status' => 'Signup payment state', 'next_billing_date' => 'Scheduled billing date'] as $key => $label) {
+        echo '<dt>' . $label . '</dt><dd>' . escape($onboarding[$key] ?: 'Not provided') . '</dd>';
+    }
+    echo '</dl><p class="form-note">Requested domains are unverified. An approved signup request is not proof of settlement or completed provisioning.</p></section>';
+}
+echo '</aside></div>';
 pageEnd();

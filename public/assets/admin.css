@@ -19,3 +19,11 @@
 @media(max-width:760px){.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-stats>div{padding:16px}.filter-form label{flex-basis:100%}}
 .admin-navigation{display:flex;gap:24px;margin:0 0 30px;padding:16px 0;border-bottom:1px solid var(--line);font-size:13px}
 .admin-navigation a:hover{text-decoration:underline}
+
+.registration-form{max-width:850px;background:white;border:1px solid var(--line);padding:30px;border-radius:12px}
+.registration-form fieldset{border:0;border-bottom:1px solid var(--line);margin:0 0 25px;padding:0 0 20px;min-width:0}
+.registration-form legend{font-size:20px;font-weight:600;margin-bottom:18px}
+.consent{display:flex;align-items:flex-start;gap:12px;font-weight:400;line-height:1.6}
+.consent input{width:auto;flex-shrink:0;margin-top:5px}
+.tenant-panel dd{overflow-wrap:anywhere}
+@media(max-width:760px){.registration-form{padding:20px}.registration-form .form-row{grid-template-columns:1fr}}
